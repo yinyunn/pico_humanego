@@ -1,0 +1,4 @@
+traj_future_len: 150   # Number of future frames to project
+traj_step: 3           # Sampling step for trajectory points
+ground_offset: 1.7     # Vertical offset (m) to place trajectory on the floor
+sensitivity_range: 2.5 # Range (m) for the mini-radar UI element

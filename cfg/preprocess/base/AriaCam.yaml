@@ -1,0 +1,54 @@
+# ==============================================================================
+# Project Aria Camera & Rectification Configuration
+# ==============================================================================
+
+# Target Frame Rate for output metadata and video.
+fps: 30
+
+# --- Camera Geometry Settings (Virtual Pinhole Model) ---
+# These parameters define the dimensions and Field of View (FOV) of the 
+# RECTIFIED (undistorted) images. The script uses these to construct a 
+# linear pinhole camera model.
+cam_size:
+  rgb:
+    w: 1920   # 3:2 aspect ratio, ~HD+, ~2.46 MP. Mild upsample from native 1408.
+    h: 1280   # Target height in pixels for the rectified RGB stream.
+    fov: 90   # Desired vertical Field of View (degrees).
+              # Used to calculate focal length: f = W / (2 * tan(fov/2)).
+
+  slam_l:
+    w: 640    # Resolution for the Left SLAM (monochrome) camera.
+    h: 480
+    fov: 90   # Note: Higher FOV values allow for more context but may cause 
+              # more stretching/aliasing at the edges of the pinhole image.
+
+  slam_r:
+    w: 640    # Resolution for the Right SLAM (monochrome) camera.
+    h: 480
+    fov: 90
+
+# --- Stream Label Mapping ---
+# These strings must match the internal labels used within the .vrs file.
+# The data provider uses these to identify the specific sensor streams.
+cam_labels:
+  rgb: "camera-rgb"              # Standard label for the central RGB sensor.
+  slam_l: "camera-slam-left"     # Standard label for the left monochrome SLAM sensor.
+  slam_r: "camera-slam-right"    # Standard label for the right monochrome SLAM sensor.
+
+
+# ==============================================================================
+# Technical Notes & References:
+# ------------------------------------------------------------------------------
+# 1. FOV Calculation: 
+#    The script calculates the focal length (f) for the virtual pinhole based on:
+#    fov = 2 * arctan(W / (2 * f))  =>  f = W / (2 * tan(radians(fov) / 2))
+#
+# 2. Image Rotation:
+#    The Aria hardware sensors are physically rotated by 90 degrees.
+#    The script automatically applies a 90° Clockwise rotation to images and 
+#    adjusts the Intrinsic Matrix (K) to match.
+#
+# 3. Documentation:
+#    For advanced image utilities and rectification logic, refer to:
+#    https://facebookresearch.github.io/projectaria_tools/docs/data_utilities/advanced_code_snippets/image_utilities
+# ==============================================================================

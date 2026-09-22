@@ -1,0 +1,84 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Python packaging and environments
+build/
+dist/
+*.egg-info/
+.eggs/
+pip-wheel-metadata/
+.venv/
+venv/
+env/
+ENV/
+
+# Test, lint and notebook caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.cache/
+.tox/
+.nox/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+.ipynb_checkpoints/
+
+# HumanEgo data and model artifacts
+/data/
+/datasets/
+/checkpoints/
+/weights/
+/pico_validation/
+/quality_reports/
+/preprocess/aria_devignetting_masks/
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+*.onnx
+*.engine
+
+# Raw recordings and generated media
+*.vrs
+*.mp4
+*.avi
+*.mov
+*.mkv
+*.tar
+*.tar.gz
+*.zip
+
+# Training and evaluation outputs
+/runs/
+/outputs/
+/logs/
+/wandb/
+/lightning_logs/
+/tensorboard/
+events.out.tfevents.*
+
+# AutoResearch runtime-only artifacts; source/config/history remain tracked
+/autoresearch/logs/*.log
+/autoresearch/tmp/
+/autoresearch/cache/
+
+# Temporary/editor/OS files
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Local agent/research instructions
+/AGENTS.md
+/AUTORESEARCH_CODEX_v2.md

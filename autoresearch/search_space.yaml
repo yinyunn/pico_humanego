@@ -1,0 +1,71 @@
+phase: loss_search
+task: open_door
+budget:
+  smoke_epochs: 1
+  search_epochs: 20
+  rule: all experiments in one comparison group use the same budget, seed, data split, and evaluation protocol
+
+# Loss search only: all non-loss training hyperparameters are frozen at exp_0006.
+allowed:
+  w_flow:
+    type: float
+    min: 0.5
+    max: 2.0
+  w_pos:
+    type: float
+    min: 1.0
+    max: 10.0
+  w_rot:
+    type: float
+    min: 0.5
+    max: 2.0
+  w_g:
+    type: float
+    min: 5.0
+    max: 20.0
+  w_done:
+    type: float
+    min: 0.1
+    max: 0.5
+  w_foresight:
+    type: float
+    min: 5.0
+    max: 40.0
+  w_contrastive:
+    type: float
+    min: 0.05
+    max: 0.5
+
+frozen:
+  - lr
+  - weight_decay
+  - grad_clip
+  - dropout
+  - use_lr_schedule
+  - warmup_steps
+  - min_lr_ratio
+  - use_ema
+  - ema_decay
+  - use_ot_cfm
+  - use_region_attn
+  - batch_size
+  - image_size
+  - pred_horizon
+  - epochs
+  - seed
+  - device
+  - pretrained checkpoint
+  - data_sources
+  - eval_source
+  - train split
+  - validation split
+  - test split
+  - img_name
+  - hand_tracking_method
+  - single_hand
+  - centric_mode
+  - frame_mode
+  - action_mode
+  - coordinate convention
+  - camera calibration
+  - robot embodiment definition

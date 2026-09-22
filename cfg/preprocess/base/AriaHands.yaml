@@ -1,0 +1,32 @@
+# ==============================================================================
+# Project Aria Hand Processing Configuration
+# ==============================================================================
+
+# --- Grasp Detection Settings ---
+grasp_threshold: 0.105       # Fingertip distance (meters) to trigger 'grasp' state (e.g., 12cm for a 5cm object).
+grasp_smooth_win: 5          # Moving average window size for fingertip distance (larger = smoother, more lag).
+grasp_flicker_max_len: 5     # Maximum length of binary flickers (0-1-0) to suppress in the grasp state.
+
+# --- Temporal Filtering & Denoising ---
+hand_conf_threshold: 0.8     # Minimum MPS confidence (0-1) required for a valid detection.
+hand_min_frames: 30          # Minimum consecutive frames for a detection segment to avoid being treated as a 'ghost'.
+hand_interp_max_gap: 10      # Maximum gap size (in frames) to fill via linear/SLERP interpolation.
+
+# --- Hand Selection Logic ---
+# Options: "auto" (highest confidence score), "left", "right", or "none" (keeps both).
+hand_selection: "none"
+
+# --- Savitzky-Golay (SG) Filter (Trajectory Smoothing) ---
+smooth_sg_window: 21         # Window size for SG filter (must be odd). Larger = more low-pass filtering.
+smooth_sg_polyorder: 2       # Polynomial order for SG filter. 2 or 3 is typical for movement.
+
+# --- Exponential Moving Average (EMA) Filtering ---
+# Values closer to 0 are smoother (more historical weight), closer to 1 follow raw data.
+smooth_ema_alpha_x: 0.15     # Smoothing factor for the Thumb -> Index vector (local X-axis).
+smooth_ema_alpha_y: 0.15     # Smoothing factor for the Wrist -> Midpoint vector (local Y-axis).
+
+# --- Optimization Constraints ---
+smooth_min_valid_frames: 6   # Minimum required data points to perform smoothing on a segment.
+smooth_fill_max_gap: 10      # Max gap to pre-fill with linear interpolation before smoothing.
+opt_v_limit: 0.6             # Linear velocity limit (m/s) for the optimizer.
+opt_w_limit: 0.8             # Angular velocity limit (rad/s) for the optimizer.

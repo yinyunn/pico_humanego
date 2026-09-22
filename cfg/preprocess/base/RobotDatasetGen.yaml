@@ -1,0 +1,37 @@
+# ==============================================================================
+# RobotDatasetGen Configuration
+# Generates training_data.json from robot-collected data (teleop / teaching)
+# ==============================================================================
+
+# Grasp threshold: grasp > threshold → is_grasping = true
+# (grasp = 1.0 - gripper_q, so this effectively means gripper_q < 0.5)
+gripper_grasp_threshold: 0.5
+
+# Kinematic latching switches (independent per hand)
+disable_kinematic_latching_left: false
+disable_kinematic_latching_right: false
+
+# Auto-mark last N frames as is_finished=1.0 if not manually marked during collection
+# Set to 0 to disable auto-marking
+finished_tail_frames: 30
+
+# PLY visualization
+export_obj_and_traj_ply: true
+ply_show_object_kpts: true
+obj_kpt_radius_m: 0.004
+obj_axes_len_m: 0.10
+
+# Trajectory rendering
+traj_use_hand: "both"           # "both" | "right_first" | "left_first"
+traj_stride: 5
+traj_max_points: 5000
+traj_point_radius_m: 0.003
+traj_line_radius_m: 0.001
+traj_axes_len_m: 0.05
+
+# PNG visualization
+export_object_centric_png: true
+png_view_elev: 20.0
+png_view_azim: 10.0
+png_dpi: 220
+png_fill_ratio: 0.80

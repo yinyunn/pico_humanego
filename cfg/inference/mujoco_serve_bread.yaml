@@ -1,0 +1,250 @@
+# HumanEgo serve_bread checkpoint evaluated on the workspace Piper MuJoCo scene.
+
+policy:
+  ckpt: "../../checkpoints/serve_bread/latest.pt"
+  num_inference_steps: 20
+
+simulation:
+  xml_path: "../../../serve_bread_scene.xml"
+  camera_name: "ego_cam"
+  width: 720
+  height: 480
+  robot_geom_group: 1
+  show_viewer: false
+  # The clean training-style image is rendered by MujocoPerception; skip the
+  # unused raw RGB-D render to keep each policy cycle fast.
+  render_raw_frame: false
+
+robot:
+  sides: ["right"]
+  # The policy and IK target the physical fingertip midpoint directly.
+  ee_site: "grasp_site"
+  base_body: "piper_mount"
+  joint_names: ["joint1", "joint2", "joint3", "joint4", "joint5", "joint6"]
+  actuator_names: ["a_joint1", "a_joint2", "a_joint3", "a_joint4", "a_joint5", "a_joint6"]
+  gripper_joint: "gripper"
+  gripper_actuator: "a_gripper"
+  gripper_open_qpos: 0.10
+  # qpos=0 makes the two Piper finger meshes overlap at the object center;
+  # qpos=0.025 leaves a clamping ~4--5 cm jaw gap for the simulated bread.
+  gripper_closed_qpos: 0.025
+  # A collision-free pose inside the checkpoint's camera-frame position support.
+  # Calibrated to the demonstration's initial hand position in camera frame
+  # (about [0.264, 0.095, 0.500] m).  The old pose put the TCP 12 cm too low,
+  # which put the ICT outside the checkpoint's approach-state distribution.
+  home_qpos: [-0.257, 2.002, -0.819, 1.487, 1.222, 0.690]
+  # teleport_home is the calibration step; an extra 1 s of position-servo
+  # settling moves this pose away from the checkpoint's initial state.
+  home_duration: 0.0
+  teleport_home: true
+  max_solution_joint_delta: 1.0
+  # Avoid a joint-space branch jump through the object while applying the
+  # model's Cartesian horizon incrementally.
+  max_command_joint_step: 0.020
+  ik_accept_position_error: 0.020
+  # The Piper cannot realize every human-hand wrist rotation at this
+  # calibrated position.  Keep the model's target pose, but make IK preserve
+  # its commanded TCP position instead of drifting to reduce rotation error.
+  ik_accept_rotation_error: 0.25
+  # ee_site/grasp_site are the calibrated physical finger-contact midpoint;
+  # their +Z points from the arm toward the fingers.
+  workspace_min_world: [-0.60, -0.40, 0.802]
+  workspace_max_world: [0.60, 0.40, 1.40]
+  # A close command is accepted only near the bread.  Cartesian motion pauses
+  # while the fingers close and resumes only after both fingers make contact.
+  grasp_validation:
+    enabled: true
+    # Pure policy evaluation: contacts are diagnostics only.  The checkpoint
+    # remains the sole source of Cartesian and gripper commands.  The optional
+    # attachment below only prevents a physically grasped free body from
+    # slipping while the model continues its transport/release trajectory.
+    enforce_control: false
+    attach_on_bilateral_contact: true
+    object_geom: "croissant_geom"
+    finger_geoms: ["piper_finger1_geom", "piper_finger2_geom"]
+    grasp_site: "grasp_site"
+    max_center_distance: 0.055
+    # Conservative mode: one-sided contact means the gripper is misaligned.
+    # Keep it open and hold Cartesian motion instead of pushing the object.
+    allow_single_contact_to_close: false
+    # Only applies after the dedicated alignment path has reached its target.
+    allow_single_contact_after_alignment: false
+    stable_contact_time: 0.15
+    # 保留单侧接触保护；触发后执行退开、横向对中、重新接近。
+    # 原值 false 已验证会停在 alignment_required，无法继续修正。
+    # auto_align_single_contact: false
+    auto_align_single_contact: true
+    # 在接触前只修正策略目标沿夹爪闭合轴的分量，其余方向和姿态仍
+    # 使用 HumanEgo 输出。这样可在不改 ICT 坐标定义的前提下居中。
+    prealign_distance: 0.0
+    prealign_max_step: 0.04
+    prealign_accept_position_error: 0.03
+    prealign_accept_rotation_error: 0.15
+    prealign_max_jaw_vertical: 0.25
+    prealign_min_approach_vertical: 0.85
+    alignment_tolerance: 0.008
+    # The tabletop is z=0.800 m. Keep the physical fingertip midpoint above it
+    # while the free-body alignment correction is running.
+    alignment_min_world_z: 0.810
+    # 单指接触后保持夹爪张开，沿两指连线方向做位置雅可比微调。
+    # Slow the lateral waypoint so the position actuators can track it.
+    alignment_max_step: 0.002
+    alignment_damping: 0.03
+    alignment_rotation_weight: 0.30
+    # Position-only approach is well-conditioned after lateral centering;
+    # allow the actuators to track the incremental target in finite time.
+    alignment_max_joint_step: 0.020
+    # 先沿夹爪接近轴退开，横向对中后再回到原抓取高度，避免单指
+    # 接触状态下直接横移而把面包推走。
+    # A shorter retreat is reachable for the current Piper posture while
+    # still clearing the one-sided contact before the lateral shift.
+    alignment_retreat_distance: 0.015
+    alignment_waypoint_tolerance: 0.003
+    alignment_center_tolerance: 0.020
+    alignment_min_clearance: 0.005
+    # 对中请求短时锁存，避免策略抓取概率波动打断三阶段动作。
+    alignment_timeout: 20.0
+    close_timeout: 0.50
+    retry_cooldown: 0.30
+  ik:
+    # Execute the model's Cartesian position exactly.  Wrist orientation is
+    # retained in the target/ICT but is not allowed to corrupt TCP translation
+    # when the Piper cannot realize the human-hand rotation.
+    position_only: false
+    # The model-issued IK solution is applied directly in this calibration
+    # scene; this removes the non-calibrated low-level position-servo lag.
+    direct_qpos: true
+    max_iter: 160
+    # Model horizon increments are 2--5 mm; 8 mm made DLS return the current
+    # joint state without applying those commands, leaving only gravity drift.
+    position_tolerance: 0.001
+    rotation_tolerance: 0.20
+    damping: 0.05
+    rotation_weight: 0.05
+    max_joint_step: 0.12
+  # Previous T_align (kept here for rollback):
+  # -1  0  0  0
+  #  0  0  1  0
+  #  0  1  0  0
+  #  0  0  0  1
+  # Problem observed: HumanEgo hand +X was nearly perpendicular to the
+  # physical Piper jaw axis, while hand +Y already matched the approach axis.
+  #
+  # Candidate retargeting (the EE->hand convention used by the checkpoint):
+  #   hand +X -> Piper jaw axis
+  #   hand +Y -> Piper approach direction (+EE Z, from the arm toward the fingertips)
+  #   hand origin -> the physical jaw contact midpoint (the XML TCP site), so
+  #   the alignment translation remains zero.
+  T_align:
+    - [0.0, 0.0, 1.0, 0.0]
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 0.0, 1.0]
+
+grasp_assist:
+  # The checkpoint still decides grasp intent.  This controller only owns the
+  # final physical approach and requires stable contact from both finger geoms.
+  # Disabled for pure policy evaluation; no simulator-side grasp retargeting.
+  enabled: false
+  object_geom: "croissant_geom"
+  start_distance: 0.12
+  pregrasp_clearance: 0.045
+  waypoint_tolerance: 0.010
+  approach_tolerance: 0.018
+  close_timeout: 0.80
+  max_joint_step: 0.12
+  ik:
+    max_iter: 180
+    position_tolerance: 0.004
+    rotation_tolerance: 0.20
+    damping: 0.05
+    max_joint_step: 0.12
+
+placement:
+  # After the simulator confirms a grasp, task-level transport owns the arm
+  # until the object is centered over the plate and the gripper is released.
+  # Disabled in the HumanEgo path: the model supplies transport and release.
+  # Keep this controller available as a separate simulator-side diagnostic.
+  enabled: false
+  target_body: "plate"
+  object_geom: "croissant_geom"
+  placement_clearance: 0.006
+  carry_height: 1.02
+  waypoint_tolerance: 0.012
+  release_settle_time: 0.35
+  max_joint_step: 0.12
+  direct_solution: true
+  ik:
+    max_iter: 180
+    position_tolerance: 0.006
+    rotation_tolerance: 0.20
+    damping: 0.05
+    max_joint_step: 0.12
+
+perception:
+  anchor_key: "obj1"
+  # The released serve_bread DatasetGen kept obj1 (the manipulated bread)
+  # static because it was selected as the virtual anchor.  Keep the physical
+  # MuJoCo bread attached/moving, but preserve this training-time anchor input
+  # after grasp so the ICT/image distribution remains compatible.
+  freeze_anchor_after_grasp: true
+  visualkpts_cfg_path: "../preprocess/base/VisualKpts.yaml"
+  objects:
+    # Object order is part of the ICT and visual-keypoint contract.
+    obj1:
+      body: "croissant"
+      keypoint_shape: "ellipse"
+      keypoint_radii: [0.060, 0.030]
+      keypoint_count: 20
+      T_object_in_body:
+        # Training obj1 frame expressed in this scene's MuJoCo world axes;
+        # this is a perception frame only, not a physical mesh rotation.
+        - [0.991377, 0.112363, 0.067419, 0.0]
+        - [0.099458, -0.980211, 0.171159, 0.0]
+        - [0.085317, -0.162978, -0.982934, 0.0]
+        - [0.0, 0.0, 0.0, 1.0]
+    obj2:
+      body: "plate"
+      keypoint_shape: "circle"
+      keypoint_radii: [0.115, 0.115]
+      keypoint_z: 0.011
+      keypoint_count: 20
+      T_object_in_body:
+        - [0.978392, 0.117026, 0.170450, 0.0]
+        - [-0.172761, 0.009817, 0.984915, 0.0]
+        - [0.113587, -0.993080, 0.029822, 0.0]
+        - [0.0, 0.0, 0.0, 1.0]
+
+control:
+  control_hz: 10.0
+  # Execute a short prefix of the checkpoint's 50-step trajectory before
+  # replanning, matching the released inference convention. Every step is
+  # still taken directly from the model trajectory.
+  exec_horizon: 8
+  done_threshold: 0.80
+  alpha_pos: 0.30
+  alpha_rot: 0.50
+  max_pos_step: 0.015
+  max_rot_step: 0.12
+  # Match HumanEgo training/inference binarization: grasp > 0.5 means close.
+  grasp_threshold: 0.50
+  # Do not wait for wall-clock real time during simulation validation.  The
+  # same 0.1 s control interval is still advanced inside MuJoCo for every
+  # executed model action, but episodes finish much faster.
+  realtime_sleep: false
+
+runtime:
+  seed: 7
+  device: "auto"
+  execute_actions: true
+  # The model controls approach, grasp, transport and release.  MuJoCo only
+  # supplies contact truth and a temporary grasp attachment after contact.
+  task_mode: "policy"
+  max_cycles: 250
+  min_cycles_before_done: 30
+  debug_every: 10
+  visualize_coordinate_frames: true
+  output_dir: "../../runs/mujoco_serve_bread"
+  home_on_exit: true
+  success_radius: 0.10
+  success_max_height: 0.10

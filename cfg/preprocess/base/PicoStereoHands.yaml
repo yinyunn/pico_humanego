@@ -1,0 +1,18 @@
+# PICO RenderMode_3D stereo hand reconstruction.
+# Values are initial QA thresholds; retain raw measurements for later tuning.
+reprojection_error_px: 4.0
+epipolar_error_px: 6.0
+min_depth_m: 0.10
+max_depth_m: 2.0
+min_ray_angle_deg: 0.5
+handedness_confidence_min: 0.5
+correspondence_ambiguity_margin_px: 2.0
+min_valid_joint_ratio: 0.65
+interpolation_max_gap_frames: 5
+position_ema_alpha: 0.55
+orientation_ema_alpha: 0.45
+grasp_close_ratio: 0.90
+grasp_open_ratio: 1.10
+grasp_hold_frames: 3
+release_hold_frames: 3
+missing_state_hold_frames: 5

@@ -1,0 +1,13 @@
+# ==============================================================================
+# Robot Data Preprocessing Master Config
+# Orchestrates the robot-domain preprocessing pipeline
+# ==============================================================================
+
+# Sub-module config paths
+DINOSAM_path: "./cfg/preprocess/base/DINOSAM.yaml"
+KptsSelector_path: "./cfg/preprocess/base/KptsSelector.yaml"
+CoTracker_path: "./cfg/preprocess/base/CoTracker.yaml"
+DepthLifter_path: "./cfg/preprocess/base/DepthLifter.yaml"
+Lama_path: "./cfg/preprocess/base/Lama.yaml"
+VisualKpts_path: "./cfg/preprocess/base/VisualKpts.yaml"
+RobotDatasetGen_path: "./cfg/preprocess/base/RobotDatasetGen.yaml"

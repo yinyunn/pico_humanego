@@ -1,0 +1,73 @@
+# ==============================================================================
+# Project Aria Manipulation Dataset Generator Config (DatasetGen.yaml)
+# ==============================================================================
+
+# --- Base Settings ---
+# Foundational filters for writing the final training data JSON files.
+
+min_hand_confidence: 0.5     # Minimum threshold for hand tracking confidence. 
+                             # If confidence is lower, the hand data is discarded for that frame 
+                             # to prevent injecting noisy kinematics into the downstream policy.
+                             
+save_debug_raw: true         # Determines whether additional debug matrices should be saved inside the JSON.
+
+
+# --- Kinematic State Machine Settings ---
+# Controls the "Latch & Propagate" logic that derives dynamic object poses.
+
+disable_kinematic_latching_left: false  # When false, the script locks the object's 6-DOF pose to the hand 
+                                        # upon a successful grasp and propagates it forward. This creates 
+                                        # a clean, continuous object trajectory even if the object is fully 
+                                        # occluded by the hand. Set to 'true' only if you want the object 
+                                        # to remain statically fixed at its initial triangulation pose forever.
+disable_kinematic_latching_right: false
+
+# --- Open3D Export Settings (PLY) ---
+# Controls the generation of the high-fidelity 3D point cloud and trajectory file.
+# Note: All visualizations map spatial data into the "Virtual Static Anchor" coordinate frame.
+
+export_obj_and_traj_ply: true # Toggle the generation of the object_centric.ply file.
+
+ply_show_object_kpts: true   # Whether to render the triangulated point cloud spheres for each object.
+
+obj_kpt_radius_m: 0.004      # The physical radius (meters) of the object point cloud spheres.
+obj_line_radius_m: 0.0015    # The physical thickness (meters) of the object coordinate axes lines.
+obj_axes_len_m: 0.10         # Length of the XYZ coordinate arrows placed at the origin of each object.
+
+
+# --- Trajectory Visualization Settings (PLY & PNG) ---
+# Configurations detailing how the historical trajectory of the hand is drawn.
+
+traj_use_hand: "both"        # Which hand's trajectory to visualize. 
+                             # Options: 'right_first' | 'left_first' | 'both' | 'right_only' | 'left_only'.
+                             # Use 'both' to see bimanual interaction, or 'right_first' to only draw 
+                             # the dominant hand (falling back to left if right is unseen).
+
+traj_stride: 5               # The frequency (in frames) at which a mini 6-DOF coordinate axis is 
+                             # stamped along the trajectory path. A stride of 5 means an axis is drawn 
+                             # every 5 frames, preventing extreme visual clutter.
+
+traj_max_points: 5000        # Safety limit for maximum trajectory points to avoid creating massive PLY files.
+
+traj_point_radius_m: 0.003   # Radius (meters) of the dots forming the trajectory path.
+traj_line_radius_m: 0.0012   # Thickness (meters) of the line connecting trajectory points.
+traj_axes_len_m: 0.05        # Length (meters) of the mini-axes stamped along the path.
+
+
+# --- Matplotlib Export Settings (PNG) ---
+# Controls the output of the 2D diagnostic plot (object_centric.png) that renders the scene 
+# from a fixed perspective. Crucial for visually verifying that the object and trajectory 
+# spatial logic is sound.
+
+export_object_centric_png: true # Toggle the generation of the Matplotlib 2D PNG export.
+
+png_view_elev: 20.0          # Camera elevation angle (degrees) for the 3D plot projection.
+png_view_azim: 10.0          # Camera azimuth angle (degrees) for the 3D plot projection.
+
+png_fixed_range_m: 0.40      # The absolute scale limits (+/- meters) for the XYZ axes in the plot.
+                             # Keeping this fixed is CRITICAL for ensuring visual consistency 
+                             # and fair scale comparison across different video sequences.
+
+png_dpi: 220                 # Resolution (Dots Per Inch) of the output PNG file.
+png_fill_ratio: 0.80         # Target scaling ratio. Ensures trajectories occupy 80% of the plot 
+                             # window, preventing them from being clipped by the edges.

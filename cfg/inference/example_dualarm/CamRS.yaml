@@ -1,0 +1,26 @@
+# RealSense RGB-D camera config (TEMPLATE) — read by CamRS.py.
+# Replace the (SET) values for your sensor. Output must be RGB + metric depth + K.
+type: "realsense"
+rs_device_serial: "REPLACE_WITH_YOUR_SERIAL"   # (SET) `rs-enumerate-devices` lists serials; "" = first found
+
+fps: 30
+w_raw: 1280        # native sensor capture resolution
+h_raw: 720
+w: 640             # (SET) target resolution after crop/resize — match your training image source
+h: 480
+warmup_frames_number: 5
+
+# depth -> 3D lifting robustness (used when estimating object poses from depth)
+lift_roi_radius_px: 6
+lift_min_depth_m: 0.15
+lift_max_depth_m: 2.50
+lift_mad_k: 3.5
+lift_abs_gate_m: 0.010
+lift_min_valid: 5
+lift_edge_dist_min_px: 3.0
+
+# multi-frame averaging for the one-time object-pose init
+object_centric_n_frames: 5
+cluster_eps_m: 0.06
+cluster_min_points: 3
+point_robust_mad_k: 4.0

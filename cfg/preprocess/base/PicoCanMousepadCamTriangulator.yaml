@@ -1,0 +1,15 @@
+# PICO can + mouse-pad downstream pose configuration.
+# Both targets are estimated geometrically from their reconstructed keypoints;
+# this keeps the import pipeline independent of an external VLM.
+step: 3
+smooth_window: 7
+smooth_polyorder: 2
+ba_f_scale: 3.0
+pose_method:
+  obj1: "pca1"
+  obj2: "pca1"
+  default: "pca1"
+pca_aniso_thresh: 0.08
+axes_len_m: 0.12
+point_radius_m: 0.005
+line_radius_m: 0.001

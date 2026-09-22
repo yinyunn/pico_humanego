@@ -1,0 +1,85 @@
+# HumanEgo training config for the `serve_bread` task.
+# Loads the released serve_bread dataset (data_sources: aria) from
+# ./data/serve_bread/aria/mps_serve_bread_*_vrs.
+# 注意：命令行参数通常会覆盖这里的同名配置。
+
+# ---- Optimization & Schedule ----
+epochs: 400                         # 训练轮数；每轮遍历一次训练集。
+batch_size: 32                      # 每个优化批次包含的样本数；受显存限制。
+lr: 1.0e-4                          # AdamW 初始学习率。
+weight_decay: 1.0e-2                # AdamW 权重衰减系数，用于正则化模型参数。
+grad_clip: 1.0                      # 梯度范数裁剪上限，防止梯度爆炸。
+use_lr_schedule: True               # 是否启用带预热和余弦衰减的学习率调度。
+warmup_steps: 200                   # 学习率从较小值升至 lr 所用的优化步数。
+min_lr_ratio: 0.05                  # 调度末期最低学习率占初始 lr 的比例。
+use_amp: True                       # 是否使用自动混合精度训练，以节省显存并加速计算。
+
+# ---- EMA ----
+use_ema: True                       # 是否维护模型参数的指数移动平均（EMA）副本。
+ema_decay: 0.999                    # EMA 衰减率；越接近 1，平均权重越平滑、更新越慢。
+
+# ---- Model Hyperparams ----
+num_inference_steps: 20             # 流匹配推理时的 ODE 数值积分步数；越大通常越平滑但越慢。
+model_h_weighting: "uniform"       # 预测时域损失权重：uniform=各未来步相同，linear=前面步更重，exp=指数衰减。
+model_h_beta: 0.0                   # exp 时域权重的衰减系数；uniform/linear 模式下基本不起作用。
+patch_size: 16                      # 输入图像划分为视觉 patch 的边长（像素）。
+vision_embed_dim: 384               # 图像 patch、ICT 状态 token 和 Transformer 的嵌入维度。
+num_decoder_layers: 6               # Transformer 解码器层数。
+num_heads: 8                        # 多头注意力的头数；需能整除 vision_embed_dim。
+mlp_ratio: 4.0                      # Transformer 中 MLP 隐藏层维度相对嵌入维度的扩展倍数。
+dropout: 0.05                       # Transformer/MLP 的 dropout 概率。
+
+# ---- Evaluation ----
+eval_every: 1                       # 每隔多少个 epoch 做一次数值评估；1 表示每轮评估。
+vis_eval_every: 100                 # 每隔多少个 epoch 生成一次可视化评估结果/视频。
+
+# ---- Augmentations ----
+use_legacy_rng: True                # 是否使用旧版的按样本固定随机种子；True 可复现增强结果。
+enable_augmentation: True           # 数据增强总开关；False 时以下各增强开关均不生效。
+enable_aug_img: True                # 启用图像光度增强，如亮度、对比度、伽马、噪声、模糊、灰度和色调变化。
+enable_aug_rrc: True                # 启用随机缩放裁剪（Random Resized Crop），再缩放回 image_size。
+enable_aug_target_jittering: True   # 给动作目标的位置和旋转标注加入小幅随机扰动。
+enable_aug_cutout: True             # 随机擦除图像局部区域，提升遮挡/缺失区域下的鲁棒性。
+enable_aug_interpolation: True      # 在相邻帧之间随机采样子帧，并插值几何状态；属于旧版增强方式。
+enable_aug_temporal_stride: False   # 是否随机改变时间采样步长，以模拟不同动作速度。
+
+# ---- Data & Task ----
+single_hand: True                   # True=只建模单手；False=同时建模左右双手。
+single_hand_side: "right"           # 单手模式使用的手：right 或 left；双手模式下该项被忽略。
+hand_tracking_method: "aria_mps"   # 从预处理 JSON 读取手部数据的方法/实体键；常见值 aria_mps、mediapipe、wilor、hamer。
+data_sources:
+  aria: 60                         # 使用 aria 数据源；通常将编号 000 留作评估，后续最多 60 段用于训练。
+eval_source: "aria"                # 从哪个数据源取留出的评估会话（该来源的第 000 段）。
+num_workers: 8                      # DataLoader 加载数据使用的子进程数；设为 0 表示主进程加载。
+
+# ---- Paradigm Ablations ----
+pred_horizon: 50                   # 每个样本向未来预测的动作步数，即动作 chunk 长度。
+img_name: "rgb_WoArm_WArmObjKpts.png" # 使用的预处理图像文件名；设为 null 可关闭视觉输入、仅使用状态。
+image_size: [240, 320]              # 输入图像尺寸，顺序为 [高度 H, 宽度 W]。
+centric_mode: "object_centric"     # 坐标/关系建模范式：object_centric 保留物体中心信息，ego_centric 采用自我中心模式。
+frame_mode: "camera_frame"         # 几何量所在参考坐标系：camera_frame=相机坐标系，anchor_frame=锚定物体坐标系。
+action_mode: "absolute"             # 动作标签形式：absolute=绝对位姿，delta=相对初始参考位姿的增量。
+max_ict: 8                          # ICT（手和物体状态 token）的最大数量；不足时补零，超出时截断。
+
+
+# ---- Model Ablations ----
+use_region_attn: True               # 启用以锚定物体为中心的可学习高斯区域注意力（spotlight）。
+use_ot_cfm: False                   # 是否使用最优传输条件流匹配；可使生成流更直，但会改变训练目标/计算方式。
+use_pre_norm: True                  # Transformer 使用 Pre-Norm；False 为旧版 Post-Norm 结构。
+use_ctx_norm: True                  # 是否对视觉/ICT 上下文 token 先做 LayerNorm。
+use_done_in_flow: False             # False=Done 使用独立分类头；True=将 Done 标志并入 flow matching 向量。
+use_legacy_image_loading: True      # True=从 JSON 中的绝对图像路径读取原始分辨率；False=按帧目录和 img_name 拼路径读取。
+
+# ---- Loss Weights ----
+w_flow: 1.0                        # 主流匹配速度场损失的总权重。
+w_pos: 5.0                         # 手部位置回归项权重；也影响启用物体动力学时的物体位置项。
+w_rot: 1.0                         # 手部旋转回归项权重；旋转使用 6D 表示。
+w_g: 10.0                          # 抓取状态（grasp）回归项权重。
+w_done: 0.2                        # 任务完成标志损失权重；取决于 use_done_in_flow 的实现路径。
+
+# ---- Aux -----
+use_aux_obj_dynamics: False        # 是否增加物体未来位姿/运动的辅助预测头和损失。
+use_aux_visual_foresight: False    # 是否增加未来手/物体二维轨迹（归一化 UV）的辅助预测损失。
+w_foresight: 20.0                  # visual foresight 辅助损失权重；仅在对应开关为 True 时生效。
+use_aux_temporal_contrastive: False # 是否预测未来 ICT 状态，用于时间一致性辅助训练。
+w_contrastive: 0.1                 # temporal contrastive/未来 ICT 辅助损失权重；仅在对应开关为 True 时生效。

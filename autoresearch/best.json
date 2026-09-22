@@ -1,0 +1,8 @@
+{
+  "experiment_id": "exp_0014",
+  "score": 0.21708719321685002,
+  "config": "cfg/training/open_door/autoresearch/exp_0014.yaml",
+  "run_dir": "runs/open_door/autoresearch/exp_0014",
+  "seed": 7,
+  "budget_level": "search"
+}

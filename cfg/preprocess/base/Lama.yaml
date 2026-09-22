@@ -1,0 +1,33 @@
+# ==============================================================================
+# LaMa Inpainting Configuration (Lama.yaml)
+# ==============================================================================
+
+# --- Model & Hardware Settings ---
+# These parameters specify the HuggingFace repository and model file for the 
+# ONNX-accelerated Large Mask Inpainting (LaMa) architecture.
+
+lama_repo_id: "Carve/LaMa-ONNX"    # HuggingFace repository containing the pre-converted ONNX model.
+lama_filename: "lama_fp32.onnx"    # The specific model weights file to download and load.
+                                   # Using FP32 guarantees high fidelity, though FP16 could be used 
+                                   # on compatible GPUs for faster inference if supported by the repo.
+
+
+# --- Inpainting Preprocessing & Inference ---
+# Controls how the input image and mask are conditioned before entering the neural network.
+# These parameters directly affect the visual quality of the background reconstruction.
+
+lama_mask_dilation: 9        # Kernel size for morphological dilation applied to the input mask.
+                             # Why? Segmentation masks (from SAM2) often perfectly hug the object, 
+                             # leaving behind shadows, reflections, or edge artifacts during inpainting.
+                             # Expanding the mask slightly ensures LaMa replaces the object AND its 
+                             # localized environmental effects.
+                             # - Increase (e.g., 15) if you see ghostly outlines left behind.
+                             # - Decrease (e.g., 3 or 5) if the object is very close to another 
+                             #   important structure that shouldn't be erased.
+
+lama_input_size: 512         # The internal square resolution the model uses for the actual inpainting pass.
+                             # The script scales the original image down to this size, runs the model, 
+                             # and scales the output back up (blending it cleanly into the original HD frame).
+                             # - 512 is the standard optimal balance between speed and quality.
+                             # - Increase (e.g., 800 or 1024) for crisper background textures at the cost 
+                             #   of exponentially higher VRAM usage and slower processing time.

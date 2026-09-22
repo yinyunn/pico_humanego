@@ -1,0 +1,51 @@
+# Thresholds are heuristics. Tune them to your camera/task and keep the same
+# config when comparing dataset versions.
+image:
+  brightness_low: 35.0
+  brightness_high: 220.0
+  contrast_low: 18.0
+  blur_laplacian_low: 45.0
+  entropy_low: 3.5
+  underexposed_pixel_threshold: 8
+  overexposed_pixel_threshold: 247
+  exposure_fraction_warn: 0.20
+  near_duplicate_hamming: 4
+
+mask:
+  nearly_empty_fraction: 0.001
+  nearly_full_fraction: 0.85
+  coverage_jump_warn: 0.20
+
+se3:
+  orthonormality_error_warn: 0.03
+  determinant_error_warn: 0.03
+  bottom_row_error_warn: 0.001
+
+trajectory:
+  hand_translation_speed_warn_mps: 2.0
+  hand_translation_jump_warn_m: 0.12
+  hand_rotation_jump_warn_deg: 70.0
+  camera_translation_speed_warn_mps: 3.0
+  camera_translation_jump_warn_m: 0.20
+  camera_rotation_jump_warn_deg: 90.0
+  object_translation_speed_warn_mps: 2.0
+  object_translation_jump_warn_m: 0.15
+  object_rotation_jump_warn_deg: 80.0
+
+time:
+  gap_factor_warn: 1.8
+  jitter_fraction_warn: 0.35
+
+score_weights:
+  schema: 25
+  geometry: 25
+  temporal: 15
+  image: 15
+  mask: 10
+  redundancy: 8
+  labels: 2
+  distribution: 0
+
+distribution:
+  train_eval_mean_shift_warn: 0.80
+  train_eval_mean_shift_error: 1.50

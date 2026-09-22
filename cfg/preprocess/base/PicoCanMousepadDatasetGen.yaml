@@ -1,0 +1,23 @@
+# Dataset export for the PICO soda-can placement task.
+anchor_key: "obj2"
+min_hand_confidence: 0.5
+save_debug_raw: true
+disable_kinematic_latching_left: false
+disable_kinematic_latching_right: false
+export_obj_and_traj_ply: true
+ply_show_object_kpts: true
+obj_kpt_radius_m: 0.004
+obj_line_radius_m: 0.0015
+obj_axes_len_m: 0.10
+traj_use_hand: "both"
+traj_stride: 5
+traj_max_points: 5000
+traj_point_radius_m: 0.003
+traj_line_radius_m: 0.0012
+traj_axes_len_m: 0.05
+export_object_centric_png: true
+png_view_elev: 20.0
+png_view_azim: 10.0
+png_fixed_range_m: 0.40
+png_dpi: 220
+png_fill_ratio: 0.80

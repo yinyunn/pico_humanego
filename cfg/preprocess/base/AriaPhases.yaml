@@ -1,0 +1,38 @@
+# ==============================================================================
+# Project Aria Task Phase Segmentation Configuration
+# ==============================================================================
+
+# --- Stop & Static State Detection ---
+# These parameters control the initial binary detection of "is the user stopped?"
+v_stop_thresh: 0.03          # Linear velocity threshold (m/s). Below this, movement is potentially a 'stop'.
+w_stop_thresh: 0.15          # Angular velocity threshold (rad/s). Below this, head rotation is minimal.
+stop_hold_frames: 15         # Min frames of continuous low speed required to initiate a 'stop' label.
+stop_debounce_frames: 8      # Max allowed "noise" frames (brief spikes in speed) to ignore within a stop.
+stop_min_on_frames: 75       # Final pass: minimum total length of a stop segment (shorter ones are removed).
+
+# --- Orientation & Veto Logic ---
+# Prevents labeling active head scanning as a static stop.
+stop_yaw_veto_deg: 20.0      # If total Yaw change during a stop exceeds this (degrees), the stop is canceled.
+                             # Increase if you have a lot of active head movement; decrease for stricter stability.
+
+# --- Temporal Offsets & Transitions ---
+# Fine-tunes the boundaries between different movement states.
+stop_offset_frames: 10       # Delay the start of a 'stop' label to ensure deceleration is complete.
+transition_offset_frames: 10  # Buffer frames inserted when switching between modes (e.g., Forward -> Rotate).
+                             # Larger values create longer 'Transition' phases.
+
+# --- Mode Classification (STOP, FORWARD, ROTATE) ---
+# Logic to distinguish between walking, rotating in place, or standing still.
+mode_min_run_frames: 30      # Minimum duration for any specific mode. Prevents rapid flickering of states.
+w_rot_thresh: 0.10           # Angular speed threshold (rad/s) to trigger 'Rotate' mode.
+v_rot_max: 0.08              # Maximum linear speed (m/s) allowed to stay in 'Rotate' mode.
+v_walk_thresh: 0.10          # Speed threshold (m/s) used specifically for summary statistics (walking segment).
+
+# --- Hand-Kinematics Refinement (Manipulation Cleaning) ---
+# Refines the STOP/MANIP phase boundaries using hand tracking velocity.
+manip_clean_vel_thresh: 0.15  # Hand velocity threshold (m/s). If hands move faster, the phase becomes 'Transition'.
+manip_clean_wait_frames: 5    # Stability window (frames) used to check average hand speed.
+manip_clean_manual_offset: 10 # Extra frames to "trim" from the MANIP phase boundaries once hands start moving.
+                             # Increase if manipulation labels start too early or end too late relative to reach.
+
+finished_frames: 30

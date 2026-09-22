@@ -1,0 +1,20 @@
+AriaHands:
+  hand_selection: "right"
+
+DINOSAM:
+  dinosam_prompt:
+    obj1: "piece of bread ."
+    obj2: "a plate ."
+    arm: "human arms . human hands ."
+
+CamTriangulator:
+  pose_method:
+    obj1: "pca1"
+    obj2: "pca1"
+    default: "pca1"
+
+DepthLifter:
+  pose_method:
+    obj1: "pca1"
+    obj2: "pca1"
+    default: "pca1"

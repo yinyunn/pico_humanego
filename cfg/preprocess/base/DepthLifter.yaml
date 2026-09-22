@@ -1,0 +1,22 @@
+# ==============================================================================
+# DepthLifter Configuration
+# Single-view depth lifting & pose estimation for robot (RealSense) data
+# ==============================================================================
+
+# Pose estimation method: "vlm" | "pca1" | "pca2"
+pose_method: "vlm"
+
+# Number of visible frames to median-filter depth for noise robustness
+# Set to 1 to disable median filtering (use first valid frame only)
+depth_median_frames: 5
+
+# Valid depth range (metres) — readings outside this range are discarded
+min_valid_depth_m: 0.1
+max_valid_depth_m: 3.0
+
+# PCA anisotropy threshold for elongated vs symmetric object detection
+pca_anisotropy_threshold: 0.08
+
+# Visualization: 3D export
+point_radius_m: 0.003
+axes_len_m: 0.05

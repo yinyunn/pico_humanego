@@ -1,0 +1,69 @@
+# HumanEgo flow-matching training config for left-hand-only open-door data.
+# No right-hand trajectory is used by this experiment.
+
+epochs: 400
+batch_size: 16
+lr: 1.0e-4
+weight_decay: 1.0e-2
+grad_clip: 1.0
+use_lr_schedule: True
+warmup_steps: 200
+min_lr_ratio: 0.05
+use_amp: True
+use_ema: True
+ema_decay: 0.999
+
+num_inference_steps: 20
+model_h_weighting: "uniform"
+model_h_beta: 0.0
+patch_size: 16
+vision_embed_dim: 384
+num_decoder_layers: 6
+num_heads: 8
+mlp_ratio: 4.0
+dropout: 0.05
+eval_every: 1
+vis_eval_every: 100
+# Continue this requested run through all 400 epochs; best.pt is still
+# updated whenever the validation score improves.
+early_stopping_patience: 0
+early_stopping_min_delta: 0.0
+
+enable_augmentation: True
+enable_aug_img: True
+enable_aug_rrc: True
+enable_aug_target_jittering: True
+enable_aug_cutout: True
+enable_aug_interpolation: True
+enable_aug_temporal_stride: False
+use_legacy_rng: True
+
+single_hand: True
+single_hand_side: "left"
+hand_tracking_method: "aria_mps"
+num_workers: 4
+pred_horizon: 50
+img_name: "rgb_WoArm_WArmObjKpts.png"
+image_size: [240, 320]
+centric_mode: "object_centric"
+frame_mode: "camera_frame"
+action_mode: "absolute"
+max_ict: 8
+
+use_region_attn: True
+use_ot_cfm: False
+use_pre_norm: True
+use_ctx_norm: True
+use_done_in_flow: False
+use_legacy_image_loading: True
+w_flow: 1.0
+w_pos: 5.0
+w_rot: 1.0
+w_g: 10.0
+w_done: 0.2
+
+use_aux_obj_dynamics: False
+use_aux_visual_foresight: False
+use_aux_temporal_contrastive: False
+w_foresight: 20.0
+w_contrastive: 0.1

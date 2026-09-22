@@ -1,0 +1,23 @@
+# ==============================================================================
+# Machine Perception Services (MPS) Configuration
+# ==============================================================================
+#
+# NOTE: This is the PUBLIC release version of AriaMPS.yaml. Fill in your own
+# Project Aria account credentials before running. The internal development
+# version (with real credentials) lives in a private repository and is never
+# published here.
+
+# --- Authentication ---
+username: "<your-aria-username>"
+password: "<your-aria-password>"
+
+# --- Feature Selection ---
+# Options: "SLAM", "HAND_TRACKING", "EYE_GAZE"
+features:
+  - "SLAM"
+  - "HAND_TRACKING"
+
+# --- Processing Settings ---
+no_ui: true
+force: true
+workers: 4

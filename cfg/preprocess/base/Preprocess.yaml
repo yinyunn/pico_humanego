@@ -1,0 +1,31 @@
+# ==============================================================================
+# Master Preprocessing Orchestrator Configuration (preprocess.yaml)
+# ==============================================================================
+
+# --- Sub-Module Configuration Paths ---
+# The master orchestrator (Preprocess.py) recursively loads configurations for each 
+# step of the pipeline. Define the relative paths to the specific YAML files here.
+
+
+AriaCam_path: "./cfg/preprocess/base/AriaCam.yaml"
+AriaHands_path: "./cfg/preprocess/base/AriaHands.yaml"
+AriaMPS_path: "./cfg/preprocess/base/AriaMPS.yaml"
+AriaPhases_path: "./cfg/preprocess/base/AriaPhases.yaml"
+AriaSlam_path: "./cfg/preprocess/base/AriaSlam.yaml"
+
+DINOSAM_path: "./cfg/preprocess/base/DINOSAM.yaml"
+KptsSelector_path: "./cfg/preprocess/base/KptsSelector.yaml"
+CoTracker_path: "./cfg/preprocess/base/CoTracker.yaml"
+CamTriangulator_path: "./cfg/preprocess/base/CamTriangulator.yaml"
+
+Lama_path: "./cfg/preprocess/base/Lama.yaml"
+VisualKpts_path: "./cfg/preprocess/base/VisualKpts.yaml"
+DatasetGen_path: "./cfg/preprocess/base/DatasetGen.yaml"
+
+# --- Alternative Hand Tracking Methods ---
+# List of hand tracking methods to run during preprocessing.
+# 'aria_mps' is always run via preprocess_aria(). Additional methods listed here
+# will generate their own per-frame JSON files (e.g., mediapipe_hands.json).
+# All results are merged into training_data.json by DatasetGen.
+# Uncomment/modify to enable ablation hand detection methods.
+hand_tracking_methods: ["aria_mps"] # "mediapipe", "wilor", "hamer"

@@ -1,0 +1,64 @@
+# ==============================================================================
+# Visual Keypoints Rendering Configuration (VisualKpts.yaml)
+# ==============================================================================
+
+# --- 3D Physical Geometry Dimensions (Unit: Meters) ---
+# These parameters construct the internal 3D wireframe model of the gripper.
+# They are projected onto the 2D image based on the actual 6-DOF camera pose.
+
+visualkpts_gripper_width_max: 0.18   # Width (m) of the gripper when fully OPEN (Reaching).
+visualkpts_gripper_width_min: 0.05   # Width (m) of the gripper when CLOSED (Pinching/Transporting).
+visualkpts_gripper_finger_len: 0.08  # Length of the "fingers" extending forward from the base.
+visualkpts_gripper_root_depth: 0.08  # Depth distance from the wrist joint to the base of the fingers.
+
+
+# --- Sampling & Density ---
+visualkpts_pts_per_line: 6           # Number of discrete circular keypoints rendered along each "bone" 
+                                     # of the hand wireframe. Increase for a denser, solid-looking line.
+
+
+# --- Trajectory (Wake/Trail) Settings ---
+# Controls the rendering of the fading historical "comet tail" that trails behind the hand and objects.
+
+visualkpts_trail_len: 0             # How many historical frames to look back when drawing the trail.
+                                     # Increase for a longer, more dramatic sweeping tail.
+visualkpts_trail_step: 1             # Frame stride for the trail. (e.g., 2 means render every 2nd past frame).
+                                     # Increase to 2 or 3 to save rendering time and create a dotted-tail effect.
+visualkpts_trail_alpha_min: 0.30     # The transparency of the oldest point in the trail (0.0 = invisible).
+visualkpts_trail_alpha_max: 0.90     # The transparency of the newest point in the trail.
+visualkpts_trail_thick_min: 1        # Thickness (pixels) of the oldest part of the trail line.
+visualkpts_trail_thick_max: 4        # Thickness (pixels) of the newest part of the trail line (tapering effect).
+visualkpts_obj_motion_th: 10.0       # Pixel motion threshold required to draw an object's trail.
+                                     # Prevents static objects from generating jittery/messy noise tails.
+
+
+# --- Keypoint Aesthetics ---
+visualkpts_radius_current: 4         # Radius (pixels) of the standard rendered keypoint dots.
+visualkpts_white_core_radius: 1      # Radius (pixels) of the inner white dot. Creates a high-contrast 
+                                     # "bullseye" effect that helps visual models focus on the exact center.
+
+
+# --- Hand Color Palette (OPEN state - Reaching) [Format: BGR] ---
+# A warm gradient to represent an active reaching action.
+
+color_hand_1_line: [0, 255, 255]     # 1. Fingertips: Pure Yellow
+color_hand_2_line: [0, 160, 255]     # 2. Finger Base: Orange-Yellow
+color_hand_3_line: [0, 60, 255]      # 3. Palm: Orange-Red
+color_hand_4_line: [0, 0, 255]       # 4. Wrist: Pure Red
+
+
+# --- Hand Color Palette (CLOSED state - Transporting) [Format: BGR] ---
+# A striking color shift to cool/vibrant tones. This instant color change 
+# provides an explicit visual cue to Vision-Language Models (VLMs) that a 
+# successful grasp has occurred.
+
+color_hand_closed_1: [255, 255, 255] # 1. Fingertips: Pure White
+color_hand_closed_2: [255, 255, 255] # 2. Finger Base: Pure White
+color_hand_closed_3: [255, 0, 255]   # 3. Palm: Bright Purple
+color_hand_closed_4: [255, 0, 255]   # 4. Wrist: Bright Purple
+
+
+# --- Multi-Object Tracking Palettes [Format: BGR] ---
+obj_colors: [[255, 255, 0], [0, 255, 0], [255, 0, 255], [0, 0, 255]]
+
+color_object_trail: [200, 150, 0]    # Color used for the fading trail drawn behind moving objects.

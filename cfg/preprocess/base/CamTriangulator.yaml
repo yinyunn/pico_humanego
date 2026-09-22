@@ -1,0 +1,51 @@
+# ==============================================================================
+# Project Aria Camera Triangulation & Pose Estimation Config (CamTriangulator.yaml)
+# ==============================================================================
+
+# --- Trajectory Smoothing & Subsampling ---
+# Controls how the 2D keypoint tracks are preprocessed before performing 3D triangulation.
+step: 3                      # Frame stride used for selecting multi-view observations. 
+                             # Higher step = fewer views (faster BA), but may reduce 3D precision.
+                             # Lower step = dense views, but potentially higher computation time.
+
+smooth_window: 7             # Savitzky-Golay filter window size applied to 2D tracks to remove jitter.
+                             # Must be an odd integer. Increase for highly noisy tracks.
+
+smooth_polyorder: 2          # Polynomial order for the Savitzky-Golay filter.
+                             # Typically kept at 2 or 3 to maintain smooth parabolic curves.
+
+
+# --- Triangulation & Bundle Adjustment (BA) ---
+# Parameters for refining the raw DLT triangulation into accurate 3D points.
+ba_f_scale: 3.0              # Huber loss scale parameter for Point-only Bundle Adjustment.
+                             # Controls the outlier rejection threshold.
+                             # Points with reprojection errors beyond this scale will have 
+                             # reduced influence on the optimization. Lower it if you suspect 
+                             # many bad tracking points are pulling the 3D shape out of place.
+
+
+# --- Pose Estimation Logic ---
+# Defines how the 6-DOF coordinate system (Rotation & Translation) is established 
+# for the reconstructed 3D point cloud of the objects.
+pose_method:
+    obj1: "vlm"
+    default: "vlm"
+
+# The core algorithm used to determine object orientation. Available options:
+# - "vlm": (Recommended) Uses Orient-Anything V2 vision model for semantic pose.
+# - "pca1": Purely geometric Star-shaped Relational Pose Estimator.
+# - "pca2": Object-Centric Relational Estimator (handles upright/fallen objects).
+
+
+pca_aniso_thresh: 0.08       # (Only applicable if pose_method is pca1). 
+                             # Threshold for planar Anisotropy ratio: (λ1 - λ2) / λ1.
+                             # Determines if the object is Elongated (e.g., Croissant) or Symmetric (e.g., Plate).
+                             # If Symmetric (below thresh), the script eliminates random yaw spinning 
+                             # by locking the X-axis to the Camera's Right vector.
+
+
+# --- 3D Export & Visualization (PLY) ---
+# Configurations strictly for rendering the Open3D output mesh and the 2D QA overlay image.
+axes_len_m: 0.12             # The visual length of the XYZ coordinate axes arrows in meters (default 12cm).
+point_radius_m: 0.005        # The physical radius of the spherical 3D keypoints in the PLY file (default 5mm).
+line_radius_m: 0.001         # The physical thickness (cylinder radius) of the axis lines in the PLY file (default 1mm).

@@ -1,0 +1,19 @@
+# Trossen arm config (TEMPLATE, RIGHT arm) — read by RobotArmTrossen.py.
+type: "trossen"
+
+model_type: "wxai_v0"             # (SET) your Trossen model
+ee_type: "wxai_v0_follower"       # (SET) end-effector type
+ip: "192.168.1.4"                 # (SET) this arm's IP address
+
+# Hand-eye extrinsic: robot base -> camera optical frame (4x4).
+# ⚠️ (SET) MUST come from YOUR hand-eye calibration. The identity below is a
+#    placeholder and WILL send the arm to the wrong place — replace it.
+T_base_in_cam: [
+    [1.0, 0.0, 0.0, 0.0],
+    [0.0, 1.0, 0.0, 0.0],
+    [0.0, 0.0, 1.0, 0.0],
+    [0.0, 0.0, 0.0, 1.0],
+]
+
+home_joints: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]   # 6 joints + gripper
+t_flange_tool: [0.145, 0, 0, 0, 0, 0]              # tool offset from flange: [x,y,z, rx,ry,rz] (m, rad)

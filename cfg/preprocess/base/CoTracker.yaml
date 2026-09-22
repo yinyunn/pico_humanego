@@ -1,0 +1,46 @@
+# ==============================================================================
+# CoTracker3 Offline Tracking Configuration (CoTracker.yaml)
+# ==============================================================================
+
+# --- Hardware & Inference Settings ---
+# These parameters control the internal scaling and chunking mechanisms of the 
+# CoTracker model. Tuning these balances tracking accuracy vs. VRAM limits.
+
+cotracker_res: 640           # Internal square resolution used for the model's attention grid.
+                             # CoTracker resizes the input image (with padding to maintain aspect ratio)
+                             # to this size. Higher (e.g., 800) = better accuracy for tiny details, 
+                             # but requires significantly more VRAM. Default is 640.
+
+cotracker_chunk_size: 100    # The number of consecutive frames passed to the model in a single batch.
+                             # Since CoTracker3 is a transformer, memory scales quadratically. 
+                             # If you encounter OutOfMemory (OOM) errors, lower this to 50 or 30.
+                             # Higher values ensure smoother continuous tracks without boundary drift.
+
+# --- Sequence Frame Selection Logic ---
+# These parameters define which segment of the full video sequence is extracted 
+# for tracking, focusing strictly on the moments just before and during manipulation.
+
+object_centric_max_frames: 60  # Maximum number of "Nav" (approach) frames to include immediately 
+                               # BEFORE the user stops to manipulate the object.
+                               # Captures the approach trajectory of the object in camera view.
+
+object_centric_min_frames: 30  # Minimum required length for the object-centric sequence.
+                               # If the approach was too fast (e.g., only 10 frames of Nav), 
+                               # the script will automatically borrow frames from the Manipulation phase 
+                               # to satisfy this minimum, ensuring stable reference frame extraction.
+
+# --- Reference Frame Extraction ---
+# Determines which frame in the filtered sequence is used as the master reference 
+# for SAM2 segmentation and keypoint generation.
+
+ref_idx: 0                   # The index of the frame where tracking queries (keypoints) are initialized.
+                             # Supports Python list indexing (e.g., 0 = first frame).
+                             # Set to -1 to use the VERY LAST frame of the "object-centric" (Nav) sequence, 
+                             # which corresponds to the exact moment right before the hand touches the object.
+                             # This is optimal because the object is closest to the camera and unoccluded.
+
+# --- Visualization Settings ---
+# Settings applied purely for rendering the output video overlays.
+
+cotracker_viz_trail_len: 20  # The length (in frames) of the historical path tail drawn behind each point.
+                             # Increase for a longer "comet tail" effect; set to 0 to only show current dots.

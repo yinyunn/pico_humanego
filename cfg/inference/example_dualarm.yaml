@@ -1,0 +1,68 @@
+# =============================================================================
+# HumanEgo — dual-arm inference config (reference template)
+# =============================================================================
+# A single annotated file wiring the whole stack (run_inference.py reads it).
+# Our internal setup splits this across several per-module yamls; it is consolidated
+# here into one file for clarity. Tune the values marked (TUNE); set the paths marked
+# (SET) for your rig.
+# =============================================================================
+
+# ---- POLICY: which checkpoint to run, and the flow-matching solver -----------
+policy:
+  # (SET) trained weights. config.json + dataset_stats.json MUST sit next to it
+  # (the trainer writes them there); they carry the architecture + normalization.
+  ckpt: "./runs/<task>/<job>/latest.pt"
+  num_inference_steps: 20      # (TUNE) Euler ODE steps. 10-20 is a good range.
+                               # Fewer = faster but coarser actions.
+
+# ---- CONTROL: how predictions become motion --------------------------------
+control:
+  control_hz: 10.0             # (TUNE) control-loop rate -> dt = 1/hz per step
+  exec_horizon: 8              # (TUNE) predicted steps executed before re-planning.
+                               # Smaller = more reactive/closed-loop, more compute.
+  done_threshold: 0.80         # (TUNE) stop when policy's done prob exceeds this
+  alpha_pos: 0.50              # (TUNE) position EMA smoothing  (higher=smoother/slower)
+  alpha_rot: 0.50              # (TUNE) rotation Slerp smoothing
+  max_pos_step: 0.05           # (TUNE) safety cage: max EE move per step, meters
+  grasp_threshold: 0.50        # (TUNE) predicted grasp prob -> close gripper above this
+  safe_z_min: -0.12            # (SET)  base-frame Z floor; protects the table
+
+# ---- PERCEPTION: objects + clean image -------------------------------------
+perception:
+  anchor_key: "obj1"           # object that defines the object-centric frame
+  n_init_frames: 10            # RGB-D frames averaged for robust initial poses
+  # (SET) open-vocabulary text prompts for each object the task involves.
+  object_prompts:
+    obj1: "a beige white cup ."
+    obj2: "a dark green cup ."
+  # (SET) what to inpaint OUT of the image so it looks embodiment-agnostic.
+  erase_prompt: "a robot arm . a robot gripper ."
+  # (SET) heavy perception model configs (only if you use the reference pipeline)
+  dinosam_cfg_path: "./cfg/preprocess/base/DINOSAM.yaml"
+  lama_cfg_path: "./cfg/preprocess/base/Lama.yaml"
+  visualkpts_cfg_path: "./cfg/preprocess/base/VisualKpts.yaml"
+
+# ---- CAMERA: one calibrated RGB-D sensor -----------------------------------
+camera:
+  # (SET) your camera driver config. Example: Intel RealSense via CamRS.yaml
+  # (serial, resolution, fps, depth range). Must output RGB + metric depth + K.
+  cfg_path: "./cfg/inference/example_dualarm/CamRS.yaml"
+
+# ---- ROBOT: the arm(s) ------------------------------------------------------
+robot:
+  sides: ["left", "right"]     # set to ["right"] for single-arm
+  # (SET) per-arm driver configs. Each MUST contain the hand-eye extrinsic
+  # T_base_in_cam (4x4). A wrong extrinsic = the robot reaches the wrong spot.
+  cfg_paths:
+    left:  "./cfg/inference/example_dualarm/RobotArmTrossenLeft.yaml"
+    right: "./cfg/inference/example_dualarm/RobotArmTrossenRight.yaml"
+  # (SET) T_align bridges YOUR end-effector frame -> the "hand" frame the model was
+  # trained on. The released HumanEgo checkpoints are Aria-MPS-trained, so use the
+  # EE->Aria-hand transform below (as-is for the Trossen example rig). Use identity
+  # instead if you trained on teleop/robot data in the same EE convention. Get this
+  # wrong and rotations will be systematically off.
+  T_align:                       # Aria-MPS EE -> hand convention
+    - [-1.0,  0.0,  0.0,  0.0]
+    - [ 0.0,  0.0,  1.0,  0.0]
+    - [ 0.0,  1.0,  0.0,  0.0]
+    - [ 0.0,  0.0,  0.0,  1.0]

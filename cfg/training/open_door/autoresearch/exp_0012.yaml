@@ -1,0 +1,99 @@
+# AutoHumanEgo open_door exp_0012。
+# 从当前 best exp_0006 派生；唯一实验变量：w_foresight 20.0 -> 30.0。
+
+epochs: 400
+batch_size: 16
+lr: 2.0e-4
+weight_decay: 1.0e-2
+grad_clip: 2.0
+use_lr_schedule: False
+warmup_steps: 200
+min_lr_ratio: 0.05
+use_amp: True
+use_ema: False
+ema_decay: 0.999
+num_inference_steps: 20
+model_h_weighting: "uniform"
+model_h_beta: 0.0
+patch_size: 16
+vision_embed_dim: 384
+num_decoder_layers: 6
+num_heads: 8
+mlp_ratio: 4.0
+dropout: 0.05
+eval_every: 1
+vis_eval_every: 100
+early_stopping_patience: 0
+early_stopping_min_delta: 0.0
+
+enable_augmentation: True
+enable_aug_img: True
+enable_aug_rrc: True
+enable_aug_target_jittering: True
+enable_aug_cutout: True
+enable_aug_interpolation: True
+enable_aug_temporal_stride: False
+use_legacy_rng: True
+
+single_hand: True
+single_hand_side: "left"
+hand_tracking_method: "aria_mps"
+num_workers: 4
+pred_horizon: 50
+img_name: "rgb_WoArm_WArmObjKpts.png"
+image_size: [240, 320]
+centric_mode: "object_centric"
+frame_mode: "camera_frame"
+action_mode: "absolute"
+max_ict: 8
+use_region_attn: True
+use_ot_cfm: False
+use_pre_norm: True
+use_ctx_norm: True
+use_done_in_flow: False
+use_legacy_image_loading: True
+
+w_flow: 1.0
+w_pos: 5.0
+w_rot: 1.0
+w_g: 10.0
+w_done: 0.2
+use_aux_obj_dynamics: False
+use_aux_visual_foresight: False
+use_aux_temporal_contrastive: False
+w_foresight: 30.0
+w_contrastive: 0.1
+
+data_paths_explicit: true
+MPS_PATHS_TRAIN:
+  - /home/yyn/workspace/pico_download/open_door/humanego_data/20260827_212421
+  - /home/yyn/workspace/pico_download/open_door/humanego_data/20260827_212518
+  - /home/yyn/workspace/pico_download/open_door/humanego_data/20260827_212540
+  - /home/yyn/workspace/pico_download/open_door/humanego_data/20260827_212602
+  - /home/yyn/workspace/pico_download/open_door/humanego_data/20260827_212621
+  - /home/yyn/workspace/pico_download/open_door/humanego_data/20260827_212640
+  - /home/yyn/workspace/pico_download/open_door/humanego_data/20260827_212709
+  - /home/yyn/workspace/pico_download/open_door/humanego_data/20260827_212730
+  - /home/yyn/workspace/pico_download/open_door/humanego_data/20260827_212748
+  - /home/yyn/workspace/pico_download/open_door/humanego_data/20260827_212808
+  - /home/yyn/workspace/pico_download/open_door/humanego_data/20260827_212825
+  - /home/yyn/workspace/pico_download/open_door/humanego_data/20260827_212845
+  - /home/yyn/workspace/pico_download/open_door/humanego_data/20260827_212906
+  - /home/yyn/workspace/pico_download/open_door/humanego_data/20260827_212930
+  - /home/yyn/workspace/pico_download/open_door/humanego_data/20260827_212959
+  - /home/yyn/workspace/pico_download/open_door/humanego_data/20260827_213019
+  - /home/yyn/workspace/pico_download/open_door/humanego_data/20260827_213040
+  - /home/yyn/workspace/pico_download/open_door/humanego_data/20260827_213059
+  - /home/yyn/workspace/pico_download/open_door/humanego_data/20260827_213108
+  - /home/yyn/workspace/pico_download/open_door/humanego_data/20260827_213132
+  - /home/yyn/workspace/pico_download/open_door/humanego_data/20260827_213151
+  - /home/yyn/workspace/pico_download/open_door/humanego_data/20260827_213213
+  - /home/yyn/workspace/pico_download/open_door/humanego_data/20260827_213237
+  - /home/yyn/workspace/pico_download/open_door/humanego_data/20260827_213300
+  - /home/yyn/workspace/pico_download/open_door/humanego_data/20260827_213323
+  - /home/yyn/workspace/pico_download/open_door/humanego_data/20260827_213416
+  - /home/yyn/workspace/pico_download/open_door/humanego_data/20260827_213436
+  - /home/yyn/workspace/pico_download/open_door/humanego_data/20260827_213500
+  - /home/yyn/workspace/pico_download/open_door/humanego_data/20260827_213522
+MPS_PATHS_EVAL:
+  - /home/yyn/workspace/pico_download/open_door/humanego_data/20260827_212341

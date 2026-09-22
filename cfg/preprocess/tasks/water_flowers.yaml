@@ -1,0 +1,20 @@
+AriaPhases:
+  finished_frames: 60
+  v_stop_thresh: 0.04
+  manip_clean_manual_offset: 30
+
+DINOSAM:
+  dinosam_prompt:
+    obj1: "a faucet ."
+    obj2: "a flower pot with flowers ."
+    arm: "human arms . human hands ."
+
+CamTriangulator:
+  pose_method:
+    obj1: "vlm"
+    obj2: "vlm"
+    default: "vlm"
+
+DatasetGen:
+  disable_kinematic_latching_right: true
+  disable_kinematic_latching_left: true
